@@ -8,13 +8,13 @@ const Genre = require('../models/genre');
 exports.genre_list = (req, res, next) => {
 	Genre.find()
 		.sort([['name', 'ascending']])
-		.exec((err, list_authors) => {
+		.exec((err, list_genres) => {
 			if (err) {
-				next(err);
+				return next(err);
 			}
 			res.render('genre_list', {
 				title: 'Genre List',
-				genre_list: list_authors,
+				genre_list: list_genres,
 			});
 		});
 };
@@ -33,12 +33,12 @@ exports.genre_detail = (req, res, next) => {
 		},
 		(err, results) => {
 			if (err) {
-				next(err);
+				return next(err);
 			}
 			if (results.genre == null) {
 				const error = new Error('Genre not found');
 				error.status = 404;
-				next(error);
+				return next(error);
 			}
 			res.render('genre_detail', {
 				title: 'Genre Detail',
@@ -76,14 +76,14 @@ exports.genre_create_post = [
 		}
 		Genre.findOne({ name: req.body.name }).exec((err, found_genre) => {
 			if (err) {
-				next(err);
+				return next(err);
 			}
 			if (found_genre) {
 				res.redirect(found_genre.url);
 			} else {
 				genre.save(error => {
 					if (error) {
-						next(error);
+						return next(error);
 					}
 					res.redirect(genre.url);
 				});

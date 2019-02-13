@@ -39,7 +39,7 @@ exports.book_list = (req, res, next) => {
 		.populate('author')
 		.exec((err, list_books) => {
 			if (err) {
-				next(err);
+				return next(err);
 			}
 			res.render('book_list', {
 				title: 'Book List',
@@ -64,12 +64,12 @@ exports.book_detail = (req, res, next) => {
 		},
 		(err, results) => {
 			if (err) {
-				next(err);
+				return next(err);
 			}
 			if (results.book == null) {
 				const error = new Error('Book not found');
 				error.status = 404;
-				next(error);
+				return next(error);
 			}
 			res.render('book_detail', {
 				title: 'Book Detail',
@@ -81,31 +81,31 @@ exports.book_detail = (req, res, next) => {
 };
 
 // Display book create form on GET.
-exports.book_create_get = function(req, res) {
+exports.book_create_get = (req, res) => {
 	res.send('NOT IMPLEMENTED: Book create GET');
 };
 
 // Handle book create on POST.
-exports.book_create_post = function(req, res) {
+exports.book_create_post = (req, res) => {
 	res.send('NOT IMPLEMENTED: Book create POST');
 };
 
 // Display book delete form on GET.
-exports.book_delete_get = function(req, res) {
+exports.book_delete_get = (req, res) => {
 	res.send('NOT IMPLEMENTED: Book delete GET');
 };
 
 // Handle book delete on POST.
-exports.book_delete_post = function(req, res) {
+exports.book_delete_post = (req, res) => {
 	res.send('NOT IMPLEMENTED: Book delete POST');
 };
 
 // Display book update form on GET.
-exports.book_update_get = function(req, res) {
+exports.book_update_get = (req, res) => {
 	res.send('NOT IMPLEMENTED: Book update GET');
 };
 
 // Handle book update on POST.
-exports.book_update_post = function(req, res) {
+exports.book_update_post = (req, res) => {
 	res.send('NOT IMPLEMENTED: Book update POST');
 };

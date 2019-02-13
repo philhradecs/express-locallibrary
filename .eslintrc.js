@@ -6,6 +6,8 @@ module.exports = {
         'prefer-arrow-callback': 'error',
         indent: ['error', 'tab'],
         camelcase: 'warn',
-        'no-underscore-dangle': 'off'
+        'consistent-return': 'off',
+        'no-underscore-dangle': 'off',
+        'func-names': 'off'
     },
 };

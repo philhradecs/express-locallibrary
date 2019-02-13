@@ -6,7 +6,7 @@ exports.bookinstance_list = (req, res, next) => {
 		.populate('book')
 		.exec((err, list_bookinstances) => {
 			if (err) {
-				next(err);
+				return next(err);
 			}
 			res.render('bookinstance_list', {
 				title: 'Book Instance List',
@@ -21,12 +21,12 @@ exports.bookinstance_detail = (req, res, next) => {
 		.populate('book')
 		.exec((err, bookinstance) => {
 			if (err) {
-				next(err);
+				return next(err);
 			}
 			if (bookinstance == null) {
 				const error = new Error('Book copy not found');
 				error.status = 404;
-				next(error);
+				return next(error);
 			}
 			res.render('bookinstance_detail', { title: 'Book', bookinstance });
 		});
