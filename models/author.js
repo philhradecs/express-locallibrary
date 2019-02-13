@@ -18,9 +18,25 @@ AuthorSchema
 	});
 
 AuthorSchema
+	.virtual('year_of_birth')
+	.get(function() {
+		return this.date_of_birth
+		? this.date_of_birth.getFullYear()
+		: '';
+	});
+
+AuthorSchema
+	.virtual('year_of_death')
+	.get(function() {
+		return this.date_of_death
+		? this.date_of_death.getFullYear()
+		: '';
+	});
+
+AuthorSchema
 	.virtual('lifespan')
 	.get(function() {
-		return (this.date_of_death.getYear() - this.date_of_birth.getYear()).toString();
+		return this.year_of_birth + ' - ' + this.year_of_death;
 	});
 
 AuthorSchema
@@ -28,5 +44,6 @@ AuthorSchema
 	.get(function() {
 		return '/catalog/author/' + this._id;
 	});
+
 
 module.exports = mongoose.model('Author', AuthorSchema);
