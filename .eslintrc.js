@@ -8,6 +8,7 @@ module.exports = {
         camelcase: 'warn',
         'consistent-return': 'off',
         'no-underscore-dangle': 'off',
-        'func-names': 'off'
+        'func-names': 'off',
+        'no-plusplus': [2, { allowForLoopAfterthoughts: true }]
     },
 };
