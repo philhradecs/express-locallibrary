@@ -83,7 +83,11 @@ exports.bookinstance_create_post = [
 			book: req.body.book,
 			imprint: req.body.imprint,
 			status: req.body.status,
-			due_back: req.body.due_back,
+			// express-validator's toDate method passes on null values
+			// null values keep mongoose schema defaults grom kicking in
+			// therefore converting `null` to `undefined`
+			due_back:
+				req.body.due_back === null ? undefined : req.body.due_back,
 		});
 
 		if (!errors.isEmpty()) {
@@ -99,7 +103,7 @@ exports.bookinstance_create_post = [
 					selected_book: bookinstance.book._id,
 					errors: errors.array(),
 					bookinstance,
-					currStatus: bookinstance.status,
+					selected_status: bookinstance.status,
 				});
 			});
 		} else {
@@ -117,8 +121,7 @@ exports.bookinstance_create_post = [
 
 // Display BookInstance delete form on GET.
 exports.bookinstance_delete_get = (req, res, next) => {
-	BookInstance
-		.findById(req.params.id)
+	BookInstance.findById(req.params.id)
 		.populate('book')
 		.exec((err, bookinstance) => {
 			if (err) {
@@ -127,36 +130,113 @@ exports.bookinstance_delete_get = (req, res, next) => {
 			if (bookinstance == null) {
 				res.redirect('/catalog/bookinstances');
 			}
-			res.render('bookinstance_delete', { title: 'Delete Book Instance', bookinstance: bookinstance });
+			res.render('bookinstance_delete', {
+				title: 'Delete Book Instance',
+				bookinstance,
+			});
 		});
 };
 
 // Handle BookInstance delete on POST.
 exports.bookinstance_delete_post = (req, res, next) => {
-	BookInstance
-		.findById(req.params.id, (err, bookinstance) => {
+	BookInstance.findById(req.params.id, (err, bookinstance) => {
+		if (err) {
+			return next();
+		}
+		if (bookinstance == null) {
+			res.redirect('/catalog/bookinstances');
+		} else {
+			BookInstance.findByIdAndRemove(req.body.bookinstanceid, error => {
+				if (error) {
+					return next(error);
+				}
+				res.redirect('/catalog/bookinstances');
+			});
+		}
+	});
+};
+
+// Display BookInstance update form on GET.
+exports.bookinstance_update_get = (req, res, next) => {
+	BookInstance.findById(req.params.id)
+		.populate('book')
+		.exec((err, bookinstance) => {
 			if (err) {
 				return next();
 			}
 			if (bookinstance == null) {
-				res.redirect('/catalog/bookinstances');
-			} else {
-				BookInstance.findByIdAndRemove(req.body.bookinstanceid, error => {
-					if (error) {
-						return next(error);
-					}
-					res.redirect('/catalog/bookinstances');
-				});
+				const error = new Error('Copy not found');
+				error.status = 404;
+				return next(error);
 			}
+
+			res.render('bookinstance_form', {
+				title: 'Update Copy',
+				bookinstance,
+				selected_status: bookinstance.status,
+			});
 		});
 };
 
-// Display BookInstance update form on GET.
-exports.bookinstance_update_get = (req, res) => {
-	res.send('NOT IMPLEMENTED: BookInstance update GET');
-};
-
 // Handle bookinstance update on POST.
-exports.bookinstance_update_post = (req, res) => {
-	res.send('NOT IMPLEMENTED: BookInstance update POST');
-};
+exports.bookinstance_update_post = [
+	// Validate fields.
+	body('imprint', 'Imprint must be specified.')
+		.isLength({ min: 1 })
+		.trim(),
+	body('status', 'Status must be specified.')
+		.isLength({ min: 1 })
+		.trim(),
+	body('due_back', 'Invalid date')
+		.optional({ checkFalsy: true })
+		.isISO8601(),
+
+	// Sanitize fields.
+	sanitizeBody('book')
+		.trim()
+		.escape(),
+	sanitizeBody('imprint')
+		.trim()
+		.escape(),
+	sanitizeBody('status')
+		.trim()
+		.escape(),
+	sanitizeBody('due_back').toDate(),
+
+	(req, res, next) => {
+		const errors = validationResult(req);
+
+		const bookinstance = new BookInstance({
+			book: req.body.book,
+			imprint: req.body.imprint,
+			status: req.body.status,
+			// express-validator's toDate method passes on null values
+			// null values keep mongoose schema defaults grom kicking in
+			// therefore converting `null` to `undefined`
+			due_back:
+				req.body.due_back === null ? undefined : req.body.due_back,
+			_id: req.params.id,
+		});
+
+		if (!errors.isEmpty()) {
+			res.render('bookinstance_form', {
+				title: 'Update Copy',
+				bookinstance,
+				selected_status: bookinstance.status,
+				errors: errors.array(),
+			});
+		} else {
+			BookInstance.findByIdAndUpdate(
+				req.params.id,
+				bookinstance,
+				{},
+				(err, instance) => {
+					if (err) {
+						return next(err);
+					}
+					res.redirect(instance.url);
+				}
+			);
+		}
+	},
+];

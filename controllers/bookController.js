@@ -253,11 +253,11 @@ exports.book_delete_post = (req, res, next) => {
 			if (results.book == null) {
 				res.redirect('/catalog/books');
 			} else {
-				BookInstance.findByIdAndRemove(req.body.bookid, error => {
+				Book.findByIdAndRemove(req.body.bookid, error => {
 					if (error) {
 						return next(error);
 					}
-					res.redirect('/catalog/bookinstances');
+					res.redirect('/catalog/books');
 				});
 			}
 		}
