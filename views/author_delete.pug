@@ -14,6 +14,7 @@ block content
     
       dl
       each book in author_books
+        hr
         dt 
           a(href=book.url) #{book.title}
         dd #{book.summary}
