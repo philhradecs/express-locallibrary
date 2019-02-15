@@ -99,7 +99,8 @@ exports.bookinstance_create_post = [
 					selected_book: bookinstance.book._id,
 					errors: errors.array(),
 					bookinstance,
-					currStatus: bookinstance.status,
+					due_back_input: bookinstance.due_back_input,
+					selected_status: bookinstance.status,
 				});
 			});
 		} else {
@@ -117,8 +118,7 @@ exports.bookinstance_create_post = [
 
 // Display BookInstance delete form on GET.
 exports.bookinstance_delete_get = (req, res, next) => {
-	BookInstance
-		.findById(req.params.id)
+	BookInstance.findById(req.params.id)
 		.populate('book')
 		.exec((err, bookinstance) => {
 			if (err) {
@@ -127,33 +127,54 @@ exports.bookinstance_delete_get = (req, res, next) => {
 			if (bookinstance == null) {
 				res.redirect('/catalog/bookinstances');
 			}
-			res.render('bookinstance_delete', { title: 'Delete Book Instance', bookinstance: bookinstance });
+			res.render('bookinstance_delete', {
+				title: 'Delete Book Instance',
+				bookinstance,
+			});
 		});
 };
 
 // Handle BookInstance delete on POST.
 exports.bookinstance_delete_post = (req, res, next) => {
-	BookInstance
-		.findById(req.params.id, (err, bookinstance) => {
+	BookInstance.findById(req.params.id, (err, bookinstance) => {
+		if (err) {
+			return next();
+		}
+		if (bookinstance == null) {
+			res.redirect('/catalog/bookinstances');
+		} else {
+			BookInstance.findByIdAndRemove(req.body.bookinstanceid, error => {
+				if (error) {
+					return next(error);
+				}
+				res.redirect('/catalog/bookinstances');
+			});
+		}
+	});
+};
+
+// Display BookInstance update form on GET.
+exports.bookinstance_update_get = (req, res, next) => {
+	BookInstance.findById(req.params.id)
+		.populate('book')
+		.exec((err, bookinstance) => {
 			if (err) {
 				return next();
 			}
 			if (bookinstance == null) {
-				res.redirect('/catalog/bookinstances');
-			} else {
-				BookInstance.findByIdAndRemove(req.body.bookinstanceid, error => {
-					if (error) {
-						return next(error);
-					}
-					res.redirect('/catalog/bookinstances');
-				});
+				const error = new Error('Copy not found');
+				error.status = 404;
+				return next(error);
 			}
-		});
-};
 
-// Display BookInstance update form on GET.
-exports.bookinstance_update_get = (req, res) => {
-	res.send('NOT IMPLEMENTED: BookInstance update GET');
+			const { book, imprint, status, due_back_input } = bookinstance;
+			res.render('bookinstance_form', {
+				book,
+				imprint,
+				status,
+				due_back_input,
+			});
+		});
 };
 
 // Handle bookinstance update on POST.
