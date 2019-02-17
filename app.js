@@ -7,8 +7,9 @@ const mongoose = require('mongoose');
 const compression = require('compression');
 const helmet = require('helmet');
 
-const mongoDB =
+const dev_db_url =
 	'mongodb://admin:local_library_01@ds119795.mlab.com:19795/local_library';
+const mongoDB = process.env.MONGODB_URI || dev_db_url;
 
 mongoose.connect(mongoDB, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;

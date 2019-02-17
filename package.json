@@ -6,6 +6,9 @@
     "start": "node ./bin/www",
     "devstart": "node ./bin/www"
   },
+  "engines": {
+    "node": "11.7.0"
+  },
   "dependencies": {
     "acorn": "^6.1.0",
     "async": "^2.6.1",
