@@ -194,7 +194,7 @@ exports.author_update_get = (req, res, next) => {
 			error.status = 404;
 			return next(error);
 		}
-		res.render('author_form', { title: 'Update Author', author: author });
+		res.render('author_form', { title: 'Update Author', author });
 	});
 };
 
@@ -251,7 +251,7 @@ exports.author_update_post = [
 				family_name: req.body.family_name,
 				date_of_birth: req.body.date_of_birth,
 				date_of_death: req.body.date_of_death,
-				_id: req.params.id
+				_id: req.params.id,
 			});
 			Author.findByIdAndUpdate(
 				req.params.id,
