@@ -10,7 +10,7 @@
     "node": "11.7.0"
   },
   "dependencies": {
-    "acorn": "^6.1.0",
+    "acorn": "^6.4.1",
     "async": "^2.6.1",
     "compression": "^1.7.3",
     "cookie-parser": "~1.4.3",
