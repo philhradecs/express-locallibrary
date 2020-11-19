@@ -8,7 +8,7 @@ const compression = require('compression');
 const helmet = require('helmet');
 
 const dev_db_url =
-	'mongodb://admin:local_library_01@ds119795.mlab.com:19795/local_library';
+'mongodb+srv://admin:local_library_01@local-library.r1r72.mongodb.net/local_library?retryWrites=true&w=majority';
 const mongoDB = process.env.MONGODB_URI || dev_db_url;
 
 mongoose.connect(mongoDB, { useNewUrlParser: true });
